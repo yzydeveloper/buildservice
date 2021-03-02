@@ -10,7 +10,6 @@ const GitPath = "https://github.com/bgwd666/deploy.git"; //远端git地址
 //   "http://admin:yxiBPPswzD3YpJS_aABJ@49.234.49.103:9090/root/test.git";
 const Temp = GitPath.split("/");
 const Ext = Temp[Temp.length - 1]; //提取目标文件夹的名称
-CloneLine();
 const CloneLine = async () => {
   const { Code, Data } = await GetMaxDiskInfo(); //获取磁盘信息
   if (Code === 0) {
@@ -35,6 +34,7 @@ const CloneLine = async () => {
     Loading.stop();
   }
 };
+CloneLine();
 // console.log(
 //   PinYin("0122yzy功能模块", {
 //     style: PinYin.STYLE_INITIALS, // 设置拼音风格
@@ -47,9 +47,9 @@ const CloneLine = async () => {
 //   loading.spinner = SpinnerStyle.arrow4;
 //   try {
 //     await ssh.connect({
-//       host: "49.234.49.103",
-//       username: "root",
-//       password: "YZYdxf20000722",
+//       host: "",
+//       username: "",
+//       password: "",
 //     });
 //     SuccessLog("SSH连接成功!");
 //   } catch (error) {

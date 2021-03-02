@@ -1,11 +1,4 @@
 const Git = require("nodegit");
-var getMostRecentCommit = function (repository) {
-  return repository.getBranchCommit("master");
-};
-var getCommitMessage = function (commit) {
-  return commit.message();
-};
-Git.Repository.open("test");
 module.exports = {
   /**
    * 克隆
