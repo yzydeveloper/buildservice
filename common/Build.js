@@ -13,15 +13,15 @@ const Ext = Temp[Temp.length - 1]; //提取目标文件夹的名称
 const CloneLine = async () => {
   const { Code, Data } = await GetMaxDiskInfo(); //获取磁盘信息
   if (Code === 0) {
-    DefaultLog("正在初始化目录");
-    const Tar = `${Data.mounted}/buildservice/gitroot/${Ext}`;
-    // 创建目标文件夹
-    await ExistsCatalog(Tar);
-    // 获取目标文件夹中是否有文件
-    const File = await Readdir(Tar);
-    const Loading = Ora(DefaultLog("正在下载文件")).start();
     try {
+      DefaultLog("正在初始化目录");
+      const Tar = `${Data.mounted}/build/gitroot/${Ext}`;
+      // 创建目标文件夹
+      await ExistsCatalog(Tar);
+      // 获取目标文件夹中是否有文件
+      const File = await Readdir(Tar);
       // 无文件则拉代码
+      var Loading = Ora(DefaultLog("正在下载文件")).start();
       if (!File.length) {
         await Clone(GitPath, Tar);
       } else {
