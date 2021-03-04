@@ -1,4 +1,4 @@
-const { initDir, download } = require("./common/build");
+const { download } = require("./common/build");
 const gitPath =
   "http://admin:yxiBPPswzD3YpJS_aABJ@49.234.49.103:9090/root/test.git"; //远端git地址
 //   "http://admin:yxiBPPswzD3YpJS_aABJ@49.234.49.103:9090/root/test.git";
