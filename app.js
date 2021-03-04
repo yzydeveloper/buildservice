@@ -7,7 +7,6 @@ const ext = temp[temp.length - 1]; //提取目标文件夹的名称
 global.gitPath = gitPath;
 global.ext = ext;
 async function run() {
-  await initDir();
   await download();
 }
 run();

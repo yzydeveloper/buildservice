@@ -5,7 +5,6 @@ const { defaultLog, errorLog, successLog } = require("./log"); //Logs
 const { getMaxDiskInfo } = require("./disk"); //获取磁盘信息
 const { hasCatalog, readdir, mkdir } = require("./node_app");
 const { clone } = require("./git");
-const initDir = async () => {};
 const download = async () => {
   try {
     defaultLog("正在初始化目录");
@@ -39,6 +38,5 @@ const download = async () => {
 //   })
 // );
 module.exports = {
-  initDir,
   download,
 };
