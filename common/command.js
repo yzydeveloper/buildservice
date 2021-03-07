@@ -1,8 +1,10 @@
 const node_ssh = require("node-ssh").NodeSSH;
 const ssh = new node_ssh();
 const ora = require("ora"); // 加载流程动画
+const inquirer = require("inquirer"); //命令行交互
 const spinner_style = require("./spinner_style"); //加载动画样式
 const { defaultLog, errorLog, successLog } = require("./log"); //Logs
+
 /**
  *
  * @param {String} command 命令操作 如 ls
@@ -28,8 +30,35 @@ const connectSSH = async () => {
   }
   loading.stop();
 };
-connectSSH()
+/**
+ * 选择
+ * @param {*} type
+ * @param {*} message
+ * @param {*} choices
+ * @returns
+ */
+const select = (message = "选择站点", choices = []) => {
+  return new Promise((resolve, reject) => {
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          message: message,
+          name: "env",
+          choices: choices,
+        },
+      ])
+      .then((answers) => {
+        if (answers) {
+          resolve(answers);
+        } else {
+          reject("配置项有误");
+        }
+      });
+  });
+};
 module.exports = {
   runCommand,
   connectSSH,
+  select,
 };
