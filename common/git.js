@@ -1,4 +1,4 @@
-const { Clone, Repository } = require("nodegit");
+const { Clone, Repository, Reference, Branch } = require("nodegit");
 class Git {
   constructor(target, repository) {
     if (!Git.instance) {
@@ -9,7 +9,52 @@ class Git {
     }
     return Git.instance;
   }
-
+  /**
+   * 拉代码
+   * @param {*} origin 当前分支的信息
+   * @param {*} branch 当前分支的原点信息
+   * @returns
+   */
+  pull(origin, branch) {
+    // return this.repository.fetch(origin).then(() => {
+    return this.repository.mergeBranches(branch, `${origin}/${branch}`);
+    // });
+  }
+  /**
+   * 切分支
+   * @param {*} branchName
+   * @returns
+   */
+  checkoutBranch(branchName) {
+    return this.repository.checkoutBranch(branchName);
+  }
+  /**
+   * 切分支
+   * @param {*} branchName
+   * @param {*} branchFullName
+   * @returns
+   */
+  checkoutRemoteBranch(branchName, branchFullName) {
+    let create = (name, fullName, sha, upstreamName) => {
+      let reference;
+      return Reference.create(this.repository, fullName, sha, 0, "")
+        .then((ref) => {
+          reference = ref;
+          return Branch.setUpstream(reference, upstreamName);
+        })
+        .then(() => {
+          return this.repository.checkoutBranch(name);
+        });
+    };
+    return this.repository.getReference(branchFullName).then((reference) => {
+      return create(
+        branchName,
+        `refs/heads/${branchName}`,
+        reference.target().tostrS(),
+        branchFullName
+      );
+    });
+  }
   /**
    * 获取默认分支
    * @returns
@@ -36,7 +81,7 @@ class Git {
     });
   }
   /**
-   * 获取分支信息
+   * 获取指定分支信息
    * @param {*} branches
    * @param {*} branch
    */
@@ -100,7 +145,7 @@ class Git {
     return result;
   }
   /**
-   * 获取来源
+   * 根据路径去分组
    * @param {*} remoteBranches
    */
   getOrigins(remoteBranches = []) {
