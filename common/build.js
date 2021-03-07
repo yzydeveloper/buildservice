@@ -4,12 +4,14 @@ const pinyin = require("pinyin");
 const { defaultLog, errorLog, successLog } = require("./log"); //Logs
 const { getMaxDiskInfo } = require("./disk"); //获取磁盘信息
 const { hasCatalog, readdir, mkdir } = require("./node_app");
-const { clone } = require("./git");
+const Git = require("./git");
 const download = async () => {
   try {
     defaultLog("正在初始化目录");
     const { data } = await getMaxDiskInfo(); //获取磁盘信息
     const tar = `${data.mounted}/build/gitroot/${global.ext}`;
+    // 设置全局的站点路径
+    global.tar = tar;
     // 是否存在这个目录
     const isExists = await hasCatalog(tar);
     if (!isExists) {
@@ -21,7 +23,7 @@ const download = async () => {
     var loading = ora(defaultLog("正在下载文件")).start();
     loading.spinner = spinner_style.arrow4;
     if (!file.length) {
-      await clone(global.gitPath, tar);
+      await Git.clone(global.gitPath, tar);
     } else {
       // 有则切分支或拉代码
     }
