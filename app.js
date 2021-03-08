@@ -1,9 +1,9 @@
 const ora = require("ora"); // 加载流程动画
-const spinner_style = require("./common/spinner_style"); //加载动画样式
-const { defaultLog, errorLog, successLog } = require("./common/log"); //Logs
-const { download, install, compileDist } = require("./common/build");
-const { select } = require("./common/command");
-const Git = require("./common/git");
+const spinner_style = require("./utils/spinner_style"); //加载动画样式
+const { defaultLog, errorLog, successLog } = require("./utils/log"); //Logs
+const { download, install, compileDist } = require("./utils/build");
+const { select } = require("./utils/command");
+const Git = require("./utils/git");
 const siteList = [
   {
     name: "PC",
