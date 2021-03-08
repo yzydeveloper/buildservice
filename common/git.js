@@ -1,24 +1,83 @@
 const { Clone, Repository, Reference, Branch } = require("nodegit");
 class Git {
-  constructor(target, repository) {
+  constructor(target) {
     if (!Git.instance) {
-      // 将 this 挂载到 Ble 这个类的 instance 属性上实现单例模式
+      // 将 this 挂载到 Git 这个类的 instance 属性上实现单例模式
       this.target = target; // 项目.git路径
-      this.repository = repository; // 存储库
       Git.instance = this;
     }
     return Git.instance;
   }
   /**
-   * 拉代码
+   * 初始化
+   */
+  init() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        this.repository = await Repository.open(global.tar); //获取存储库
+        this.branchs = await this.getReferences(); //获取分支的实例信息
+        this.currentBranch = await this.getCurrentBranch();
+        this.remoteBranches = this.getRemoteBranches(); //获取远程分支的信息
+        this.localBranches = this.getLocalBranches(); //获取远程分支的信息
+        this.origins = this.getOrigins(this.remoteBranches); //获取所有分支的来源信息
+        this.curBranchInfo = this.getBranchInfo(
+          this.remoteBranches,
+          this.currentBranch.name().split("/").reverse()[0]
+        ); //获取当前分支的信息
+        this.curOriginInfo = await this.getCurrentOrigin(); //获取当前分支的来源信息
+        resolve("初始化成功");
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+  /**
+   * 签出分支
+   * @param {*} branchName 分支名
+   * @param {*} branchFullName 分支全名/origin/xxx
+   */
+  checkout(branchName, branchFullName) {
+    // 如果本地分支有所选的分支则直接切换、无则迁出远程分支
+    return new Promise(async (resolve, reject) => {
+      try {
+        let flag = this.localBranches.some((item) => item.name === branchName);
+        if (flag) {
+          await this.checkoutBranch(branchName);
+        } else {
+          await this.checkoutRemoteBranch(
+            branchName,
+            branchFullName.replace(/refs\/remotes\//, "")
+          ); //切换分支
+        }
+        this.currentBranch = await this.getCurrentBranch();
+        this.curBranchInfo = this.getBranchInfo(
+          this.remoteBranches,
+          this.currentBranch.name().split("/").reverse()[0]
+        ); //获取当前分支的信息
+        this.curOriginInfo = await this.getCurrentOrigin(); //获取当前分支的来源信息
+        //获取当前分支的来源信息
+        resolve("签出成功");
+      } catch (error) {
+        reject("签出失败");
+      }
+    });
+  }
+  /**
+   * 拉取当前分支代码
    * @param {*} origin 当前分支的信息
    * @param {*} branch 当前分支的原点信息
    * @returns
    */
-  pull(origin, branch) {
-    // return this.repository.fetch(origin).then(() => {
-    return this.repository.mergeBranches(branch, `${origin}/${branch}`);
-    // });
+  pull() {
+    // ==
+    let branch = this.curBranchInfo.name.split("/").reverse()[0];
+    let { origin } = this.getOriginInfo(
+      this.origins,
+      this.curOriginInfo && this.curOriginInfo.name()
+    );
+    return this.repository.fetch(origin).then(() => {
+      return this.repository.mergeBranches(branch, `${origin}/${branch}`);
+    });
   }
   /**
    * 切分支
@@ -62,6 +121,13 @@ class Git {
   getCurrentBranch() {
     return this.repository.getCurrentBranch(this.repository);
   }
+  /**
+   * 获取默认分支的来源信息
+   * @returns
+   */
+  getCurrentOrigin() {
+    return Branch.upstream(this.currentBranch);
+  }
 
   /**
    * 获取所有分支的实例
@@ -98,7 +164,7 @@ class Git {
    * 获取远程分支列表
    * @param {*} branches
    */
-  getRemoteBranches(branches = []) {
+  getRemoteBranches(branches = this.branchs) {
     let remoteBranches = branches.filter((branch) => {
       return branch.name().indexOf("refs/remotes") != -1;
     });
@@ -116,7 +182,7 @@ class Git {
    * 获取本地分支列表
    * @param {*} branches
    */
-  getLocalBranches(branches = []) {
+  getLocalBranches(branches = this.branchs) {
     let localBranches = branches.filter((branch) => {
       return branch.name().indexOf("refs/heads") != -1;
     });
@@ -145,7 +211,7 @@ class Git {
     return result;
   }
   /**
-   * 根据路径去分组
+   * 获取所有的来源信息
    * @param {*} remoteBranches
    */
   getOrigins(remoteBranches = []) {

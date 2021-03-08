@@ -20,14 +20,14 @@ const download = async () => {
     // 获取目标文件夹中是否有文件
     const file = await readdir(tar);
     // 无文件则拉代码
-    var loading = ora(defaultLog("正在下载文件")).start();
+    var loading = ora(defaultLog("正在初始化站点")).start();
     loading.spinner = spinner_style.arrow4;
     if (!file.length) {
       await Git.clone(global.gitPath, tar);
     } else {
       // 有则切分支或拉代码
     }
-    successLog("下载成功");
+    successLog("初始化成功");
   } catch (error) {
     errorLog(error);
     process.exit(); //退出流程
