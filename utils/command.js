@@ -20,9 +20,9 @@ const connectSSH = async () => {
   loading.spinner = spinner_style.arrow4;
   try {
     await ssh.connect({
-      host: "49.234.49.103",
-      username: "root",
-      password: "YZYdxf20000722",
+      host: "服务器IP地址",
+      username: "用户名",
+      password: "密码",
     });
     successLog("SSH连接成功!");
   } catch (error) {
