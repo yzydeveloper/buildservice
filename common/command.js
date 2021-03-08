@@ -12,7 +12,9 @@ const { defaultLog, errorLog, successLog } = require("./log"); //Logs
 const runCommand = async (command) => {
   const result = await ssh.exec(command, [], { cwd: "/data/www" });
 };
-//连接服务器
+/**
+ * 连接服务器
+ */
 const connectSSH = async () => {
   const loading = ora(defaultLog("正在连接服务器")).start();
   loading.spinner = spinner_style.arrow4;
