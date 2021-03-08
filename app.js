@@ -25,16 +25,23 @@ async function build() {
   const newGit = new Git(global.tar, repository); //实例化git
   const branchs = await newGit.getReferences(); //获取分支的实例信息
   const remoteBranches = newGit.getRemoteBranches(branchs); //获取远程分支的信息
+  const localBranches = newGit.getLocalBranches(branchs); //获取远程分支的信息
   const origins = newGit.getOrigins(remoteBranches); //获取所有的来源
-  const selectBranches = remoteBranches.map((item) => {
+  const branchesList = remoteBranches.map((item) => {
     return {
       name: item.name.split("/").reverse()[0],
       value: item.fullName,
     };
   });
-  const { env } = await select("选择分支名称", selectBranches); //选择分支
-  // 此处写法可以简写..为了使用api没有简写
-  await newGit.checkoutRemoteBranch(env.split("/").reverse()[0], env); //切换分支
+  const { env } = await select("选择分支名称", branchesList); //选择分支
+  let cur = env.split("/").reverse()[0];
+  // 如果本地分支有所选的分支则直接切换、无则迁出远程分支
+  let flag = localBranches.some((item) => item.name === cur);
+  if (flag) {
+    await newGit.checkoutBranch(cur);
+  } else {
+    await newGit.checkoutRemoteBranch(cur, env.replace(/refs\/remotes\//, "")); //切换分支
+  }
   // const currentBranch = await newGit.getCurrentBranch(); //获取切换过来分支的信息
   // const defaultBranch = newGit.getBranchInfo(
   //   remoteBranches,
