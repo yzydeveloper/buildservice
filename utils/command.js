@@ -61,7 +61,7 @@ const uploadBySSH = async (branchPath) => {
   loading.spinner = spinner_style.arrow4;
   try {
     await putDirectory(`${global.tar}/dist`, PATH + "/dist");
-    successLog("上传成功!");
+    successLog(`上传成功~ 地址: ${branchPath}.cloudrd.cn`);
     //将目标目录的dist里面文件移出到目标文件
     //举个例子 假如我们部署在 /test/html 这个目录下 只有一个网站, 那么上传解压后的文件在 /test/html/dist 里
     //需要将 dist 目录下的文件 移出到 /test/html ;  多网站情况, 如 /test/html/h5  或者 /test/html/admin 都和上面同样道理
