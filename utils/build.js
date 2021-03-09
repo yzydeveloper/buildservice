@@ -5,6 +5,7 @@ const { defaultLog, errorLog, successLog } = require("./log"); //Logs
 const { getMaxDiskInfo } = require("./disk"); //获取磁盘信息
 const { hasCatalog, readdir, mkdir } = require("./node_app");
 const { select } = require("./command");
+const { APPLICATION_PORTAL } = require("./../config");
 const Git = require("./git");
 /**
  * 初始化项目
@@ -12,7 +13,7 @@ const Git = require("./git");
 const download = async () => {
   try {
     const { data } = await getMaxDiskInfo(); //获取磁盘信息
-    const tar = `${data.mounted}/build/gitroot/${global.ext}`;
+    const tar = `${data.mounted}${APPLICATION_PORTAL}/${global.ext}`;
     // 设置全局的站点路径
     global.tar = tar;
     // 是否存在这个目录

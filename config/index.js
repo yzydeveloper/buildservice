@@ -3,6 +3,7 @@ module.exports = Object.freeze({
   SSH_USER: "", // ssh 用户名
   PASSWORD: "", // 用密码连接服务器
   PATH: "/data/www", // 需要上传的服务器目录地址 如 /data/www/
+  APPLICATION_PORTAL: "/buildservice/gitroot",
   SITE_DATA: [
     {
       name: "PC",
