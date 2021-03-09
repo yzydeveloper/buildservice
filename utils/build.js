@@ -45,7 +45,7 @@ const install = async (path) => {
   const loading = ora(defaultLog("下载依赖")).start();
   loading.spinner = spinner_style.arrow4;
   shell.cd(path);
-  const res = await shell.exec("npm install"); //执行shell 打包命令
+  const res = await shell.exec(global.SITE_INFO.install); //执行shell 打包命令
   loading.stop();
   if (res.code === 0) {
     successLog("依赖下载完成!");
@@ -62,7 +62,7 @@ const compileDist = async (path) => {
   const loading = ora(defaultLog("项目开始打包")).start();
   loading.spinner = spinner_style.arrow4;
   shell.cd(path);
-  const res = await shell.exec("npm run build"); //执行shell 打包命令
+  const res = await shell.exec(global.SITE_INFO.build); //执行shell 打包命令
   loading.stop();
   if (res.code === 0) {
     successLog("项目打包成功!");

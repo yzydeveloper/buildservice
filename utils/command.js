@@ -5,7 +5,6 @@ const ora = require("ora"); // 加载流程动画
 const inquirer = require("inquirer"); //命令行交互
 const spinner_style = require("./spinner_style"); //加载动画样式
 const { defaultLog, errorLog, successLog } = require("./log"); //Logs
-const { hasCatalog } = require("./node_app");
 const CONFIG = require("./../config");
 /**
  *
