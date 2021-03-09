@@ -1,17 +1,16 @@
 const ora = require("ora"); // 加载流程动画
 const shell = require("shelljs"); // 执行shell命令
 const spinner_style = require("./spinner_style"); //加载动画样式
-const pinyin = require("pinyin");
 const { defaultLog, errorLog, successLog } = require("./log"); //Logs
 const { getMaxDiskInfo } = require("./disk"); //获取磁盘信息
 const { hasCatalog, readdir, mkdir } = require("./node_app");
+const { select } = require("./command");
 const Git = require("./git");
 /**
  * 初始化项目
  */
 const download = async () => {
   try {
-    defaultLog("正在初始化目录");
     const { data } = await getMaxDiskInfo(); //获取磁盘信息
     const tar = `${data.mounted}/build/gitroot/${global.ext}`;
     // 设置全局的站点路径
@@ -72,13 +71,36 @@ const compileDist = async (path) => {
     process.exit(); //退出流程
   }
 };
-// console.log(
-//   PIN_YIN("0122yzy功能模块", {
-//     style: PIN_YIN.STYLE_INITIALS, // 设置拼音风格
-//   })
-// );
+/**
+ * 拉代码流程
+ */
+const gitPull = async () => {
+  try {
+    const newGit = new Git(global.tar); //实例化git
+    await newGit.init(); //初始化git
+    const branchesList = newGit.remoteBranches.map((item) => {
+      return {
+        name: item.name.split("/").reverse()[0],
+        value: item.fullName,
+      };
+    });
+    const { env } = await select("选择分支名称", branchesList); //选择分支
+    let selected = env.split("/").reverse()[0];
+    var loading = ora(defaultLog("正在拉取代码")).start();
+    loading.spinner = spinner_style.arrow4;
+    await newGit.checkout(selected, env); //签出分支
+    await newGit.pull();
+    successLog("拉取成功");
+  } catch (error) {
+    errorLog(error);
+    errorLog("拉取失败!");
+    process.exit(); //退出流程
+  }
+  loading.stop();
+};
 module.exports = {
   download,
   compileDist,
   install,
+  gitPull,
 };

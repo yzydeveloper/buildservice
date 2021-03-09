@@ -1,8 +1,6 @@
-const ora = require("ora"); // 加载流程动画
-const spinner_style = require("./utils/spinner_style"); //加载动画样式
-const { defaultLog, errorLog, successLog } = require("./utils/log"); //Logs
-const { download, install, compileDist } = require("./utils/build");
-const { select } = require("./utils/command");
+const { download, gitPull, install, compileDist } = require("./utils/build");
+const { select, uploadBySSH, runCommand } = require("./utils/command");
+const pinyin = require("pinyin");
 const Git = require("./utils/git");
 const siteList = [
   {
@@ -14,34 +12,7 @@ const siteList = [
     value: "http://admin:yxiBPPswzD3YpJS_aABJ@49.234.49.103:9090/root/h5.git",
   },
 ];
-/**
- * 拉代码流程
- */
-async function gitPull() {
-  try {
-    const newGit = new Git(global.tar); //实例化git
-    await newGit.init(); //初始化git
-    const branchesList = newGit.remoteBranches.map((item) => {
-      return {
-        name: item.name.split("/").reverse()[0],
-        value: item.fullName,
-      };
-    });
-    const { env } = await select("选择分支名称", branchesList); //选择分支
-    let selected = env.split("/").reverse()[0];
-    var loading = ora(defaultLog("正在拉取代码")).start();
-    loading.spinner = spinner_style.arrow4;
-    await newGit.checkout(selected, env); //签出分支
-    await newGit.pull();
-    successLog("拉取成功");
-  } catch (error) {
-    errorLog(error);
-    errorLog("拉取失败!");
-    process.exit(); //退出流程
-  }
-  loading.stop();
-}
-async function build() {
+async function releaseBuild() {
   // 选择站点
   const site = await select("选择站点", siteList);
   const temp = site.env.split("/");
@@ -49,8 +20,13 @@ async function build() {
   global.gitPath = site.env;
   global.ext = ext;
   await download(); //初始化仓库
-  await gitPull();
-  await install(global.tar);
-  await compileDist(global.tar);
+  await gitPull(); //拉代码
+  await install(global.tar); //下载依赖
+  await compileDist(global.tar); //打包
+  let branch = new Git().curBranchInfo.name.split("/").reverse()[0];
+  branch = pinyin(branch, {
+    style: pinyin.STYLE_INITIALS,
+  }).join(""); //将分支名转为拼音风格
+  await uploadBySSH(branch); //执行上传操作
 }
-build();
+releaseBuild();
