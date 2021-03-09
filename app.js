@@ -18,7 +18,9 @@ async function releaseBuild() {
   let branch = new Git().curBranchInfo.name.split("/").reverse()[0];
   branch = pinyin(branch, {
     style: pinyin.STYLE_INITIALS,
-  }).join(""); //将分支名转为拼音风格
+  })
+    .join("")
+    .toLowerCase(); //将分支名转为拼音风格
   await uploadBySSH(branch); //执行上传操作
 }
 releaseBuild();

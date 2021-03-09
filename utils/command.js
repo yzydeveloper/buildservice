@@ -53,12 +53,13 @@ const uploadBySSH = async (branchPath) => {
   await connectSSH();
   const PATH = `${CONFIG.PATH}/${branchPath}`; //上传到线上nginx目录的路径
   const loading = ora(defaultLog("准备上传文件")).start();
-  const { files } = await runCommand(`ls ${branchPath}`); //获取分支站点目录信息
-  if (files) {
+  const { files } = await runCommand(`ls ${CONFIG.PATH}`); //获取站点目录信息
+  if (files.indexOf(branchPath) !== -1) {
     await runCommand("rm -rf *", branchPath); //如果有则清空目录
   }
   loading.spinner = spinner_style.arrow4;
   try {
+    console.log(PATH);
     await putDirectory(`${global.tar}/dist`, PATH + "/dist");
     successLog(`上传成功~ 地址: ${branchPath}.cloudrd.cn`);
     //将目标目录的dist里面文件移出到目标文件
