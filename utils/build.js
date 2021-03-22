@@ -11,6 +11,7 @@ const Git = require("./git");
  * 初始化项目
  */
 const download = async () => {
+  let loading;
   try {
     const { data } = await getMaxDiskInfo(); //获取磁盘信息
     const tar = `${data.mounted}${APPLICATION_PORTAL}/${global.ext}`;
@@ -24,7 +25,7 @@ const download = async () => {
     // 获取目标文件夹中是否有文件
     const file = await readdir(tar);
     // 无文件则拉代码
-    var loading = ora(defaultLog("正在初始化站点")).start();
+    loading = ora(defaultLog("正在初始化站点")).start();
     loading.spinner = spinner_style.arrow4;
     if (!file.length) {
       await Git.clone(global.gitPath, tar);
@@ -36,7 +37,9 @@ const download = async () => {
     errorLog(error);
     process.exit(); //退出流程
   }
-  loading.stop();
+  if (loading) {
+    loading.stop();
+  }
 };
 /**
  *
@@ -76,6 +79,7 @@ const compileDist = async (path) => {
  * 拉代码流程
  */
 const gitPull = async () => {
+  let loading;
   try {
     const newGit = new Git(global.tar); //实例化git
     await newGit.init(); //初始化git
@@ -87,7 +91,7 @@ const gitPull = async () => {
     });
     const { env } = await select("选择分支名称", branchesList); //选择分支
     let selected = env.split("/").reverse()[0];
-    var loading = ora(defaultLog("正在拉取代码")).start();
+    loading = ora(defaultLog("正在拉取代码")).start();
     loading.spinner = spinner_style.arrow4;
     await newGit.checkout(selected, env); //签出分支
     await newGit.pull();
@@ -97,7 +101,9 @@ const gitPull = async () => {
     errorLog("拉取失败!");
     process.exit(); //退出流程
   }
-  loading.stop();
+  if (loading) {
+    loading.stop();
+  }
 };
 module.exports = {
   download,
